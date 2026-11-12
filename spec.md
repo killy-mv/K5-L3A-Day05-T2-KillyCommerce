@@ -48,24 +48,182 @@
 
 **Phương án bị loại:** chỉ tập trung S1/S8 vì dễ mô phỏng thì không thử được lỗi **nguồn thật nhưng sai** và **AI có thể làm nhưng không được phép làm**. Vì thế S2 và S5 sẽ xuyên suốt §3–§5.
 
-## §3. Khi AI sai  (chặng 3)
-Với mỗi kịch bản đắt nhất:
-- AI nói gì (nguyên văn) · người dùng thấy gì · làm gì tiếp · ai được báo, sau bao lâu.
-- Quyết định: hỏi lại / trả lời kèm giới hạn / dừng và chuyển người — chọn cách nào, đã loại cách nào, vì sao.
-- Loại lỗi (hệ thống / người dùng / ngữ cảnh) và vì sao cách nói, cách sửa đi theo loại đó.
-- 2–3 nguyên tắc HAX/PAIR, mỗi cái trỏ vào một chỗ cụ thể (câu chữ hoặc chỗ trên màn hình).
-- Lỗi nào sửa câu chữ không cứu được (nếu có), và thiết kế cứu nó thế nào.
+## §3. Khi AI sai — thiết kế UX (chặng 3)
 
-## §4. Mức tự chủ  (chặng 4)
-Với mỗi tool:
-- Mức của nhóm (tự làm / cần người duyệt / cấm). Nếu cần người duyệt: ai duyệt · người duyệt thấy gì · quá hạn thì sao.
-- Lý do theo cost-of-error: sai thì ai chịu gì · đảo lại được không · chờ người thì mất gì.
-- Phương án đã cân nhắc và vì sao loại.
-Thêm:
-- Tool khó xếp nhất: mỗi người từng chọn gì, cái giá của mỗi phía (trỏ về kịch bản ở §2), nhóm chốt thế nào.
-- Thử mức đã đặt trên 2 kịch bản đắt nhất + 1 kịch bản bình thường: cái sai có bị chặn không? còn việc nào làm khi lẽ ra phải hỏi? người dùng bình thường có phải chờ vô ích không?
-- Luật thêm hoặc tool tách bước (nếu có), và vì sao.
-- Một mức tự chủ đã đổi lời hứa nào với người dùng.
+### 3.0. Phạm vi, dữ liệu và bằng chứng
+
+Hai ca chính là **S2 (nguồn §3.3 có phát biểu sai)** và **S5 (học viên xin giải hộ Bài tập 3 đang mở)**, đã chọn tại §2. Mục tiêu: giúp học viên biết **AI biết gì, chưa chắc điều gì, không được phép làm gì**, kiểm tra được nguồn và chọn đường xử lý tiếp theo.
+
+Prototype: `prototype/index.html` — một file HTML với CSS và JavaScript nhúng; **tình huống, kiểm tra và phản hồi đều giả lập bằng quy tắc**, không có lời gọi AI thật, backend hoặc TA thực. Hai ảnh chụp trực tiếp từ Chrome, được đánh số để đối chiếu:
+- [Ảnh 1 — S2: cảnh báo nguồn, phản ví dụ và yêu cầu chuyển TA](prototype/screen-s2.png).
+- [Ảnh 2 — S5: giới hạn đáp án và gợi ý học từng bước](prototype/screen-s5.png).
+
+### 3.1. S2 — Nguồn tài liệu có thật nhưng nội dung sai
+
+**Dữ liệu & cái giá khi sai.** Học viên hỏi: *“Độ lệch chuẩn luôn nhỏ hơn phương sai đúng không ạ? Tài liệu ghi vậy.”* Dữ liệu A §3.3 có câu khẳng định sai “độ lệch chuẩn luôn nhỏ hơn phương sai”. Nếu `tra_cuu_tai_lieu` nhắc lại mà không kiểm tra, học viên có thể học sai. Đăng nội dung đó lên FAQ (`dang_FAQ`) làm nhiều học viên sai cùng lúc; gỡ FAQ không đảm bảo thu hồi kiến thức đã đọc.
+
+**Phản hồi AI hiển thị (trích nguyên văn giao diện):**
+
+> Mình tìm thấy khẳng định này ở §3.3, nhưng nó không đúng trong mọi trường hợp. Mình sẽ không khẳng định tài liệu luôn đúng chỉ vì có trích dẫn.
+>
+> Phản ví dụ về trị số: căn bậc hai của 0,25 là 0,5.
+>
+> Hai đại lượng có đơn vị khác nhau nên không thể áp dụng quy tắc so sánh tuyệt đối. Bạn có thể gửi đoạn này cho TA xác minh.
+
+Ngay dưới phản hồi là câu trích đúng từ §3.3 và minh hoạ **phương sai = 0,25 → độ lệch chuẩn = 0,5**. Đây là phản ví dụ **về trị số**, không phải phép so sánh hai đại lượng có cùng đơn vị.
+
+| Quyết định UX | Người dùng thấy/làm | Chọn vì sao; phương án loại |
+|---|---|---|
+| Cảnh báo không làm người học hoảng | Nhãn **“Chưa xác minh”** và màu vàng nhạt tại **ảnh S2 [1]** | Cảnh báo có chữ và màu để phân biệt với câu trả lời chắc chắn. **Loại** nhãn “đã kiểm chứng” khi chưa có TA; **loại** đỏ toàn màn hình vì dễ gây báo động quá mức. |
+| Cho kiểm tra bằng chứng | Thấy trích dẫn §3.3, gạch chân câu cần sửa và phản ví dụ tại **ảnh S2 [2]** | “Có nguồn” không đồng nghĩa “nguồn đúng”. **Loại** chỉ nói “AI có thể sai” mà không chỉ rõ sai ở đâu; **loại** tự sửa thầm tài liệu. |
+| Để học viên chủ động chuyển người | Nút **“Gửi TA xác minh”**, **ảnh S2 [3]**, mở hộp thoại chứa nội dung cần gửi; chọn **“Xác nhận gửi”** hoặc **“Để sau”** | Có bước đồng ý trước khi tạo yêu cầu. **Loại** tự gửi mọi ca vì gây quá tải; **loại** chỉ cảnh báo nhưng không có lối thoát. |
+| Trạng thái trung thực và có sửa sai | Sau xác nhận, hiện **“Yêu cầu #…: Chờ TA xác minh”** và **“Rút yêu cầu”** khi còn chờ, **ảnh S2 [4]** | Không được đánh đồng “đã gửi” với “TA đã xem/duyệt”. **Loại** thông báo “đã xử lý” khi thực tế chưa có người thao tác. |
+
+**Luồng đầy đủ:** AI hiển thị cảnh báo → học viên đọc nguồn và giải thích → có thể chọn gửi TA → hộp thoại xác nhận → yêu cầu vào hàng chờ → TA mở màn hình **Trợ giảng TA**, xem lý do và dự thảo đính chính → TA chọn **“Cần xác minh thêm”** hoặc tự chỉnh nội dung rồi **“TA duyệt & đăng FAQ”**. Không có nút để AI tự đăng FAQ hoặc tự sửa tài liệu.
+
+**Ai được báo và khi nào?** Trong prototype, chỉ sau khi học viên bấm **“Xác nhận gửi”**, hàng chờ **TA** được thêm yêu cầu ngay (trong cùng phiên trình duyệt). Nếu bấm “Để sau” hoặc không thao tác, TA không nhận yêu cầu. Dữ liệu B quy định TA làm việc **08:00–22:00**; ngoài giờ chỉ hiện **đang chờ**, không hứa giờ trả lời. Đây là chuyển trạng thái **giả lập**, không gửi thông báo thực.
+
+**Phân loại lỗi:** lỗi trọng tâm là **lỗi hệ thống/nguồn tri thức** vì tài liệu đầu vào sai; không đổ lỗi cho học viên đã hỏi theo tài liệu. Đồng thời có nguy cơ **lỗi ngữ cảnh** khi AI trích đúng nhưng áp dụng sai ý nghĩa của trích dẫn. Cách sửa: làm rõ phần nào có căn cứ, đưa phản ví dụ và chuyển người có thẩm quyền, thay vì chỉ đổi lời xin lỗi.
+
+### 3.2. S5 — Học viên muốn AI giải hộ bài đang mở
+
+**Dữ liệu & cái giá khi sai.** Học viên hỏi: *“Tính hết bài 3 cho em, em sắp hết hạn rồi. Gửi luôn đáp án để em nộp.”* Dữ liệu A §3.5 có 8 mức lương; dữ liệu B cho biết **Bài tập 3 đang mở, hạn 13/11/2026 23:59**. Nếu `goi_y_bai_tap` trả toàn bộ phép tính và kết luận, AI làm hộ bài học viên. Xóa tin sau đó không thể thu hồi đáp án đã đọc.
+
+**Phản hồi AI hiển thị (trích nguyên văn giao diện):**
+
+> Mình biết bạn đang gấp. Vì Bài tập 3 còn mở, mình không thể giải trọn bài hay xác nhận đáp số. Nhưng mình có thể giúp bạn tự làm.
+>
+> Bước đầu: muốn tính trung bình cộng, cần làm những phép toán nào với 8 giá trị? Với trung vị, hãy xem dãy đã sắp xếp chưa.
+
+| Quyết định UX | Người dùng thấy/làm | Chọn vì sao; phương án loại |
+|---|---|---|
+| Từ chối có giải thích, không phán xét | Nhãn **“Giới hạn đáp án”** tại **ảnh S5 [5]**, giải thích đây là bài đang mở | Người học hiểu ranh giới; **loại** câu từ chối trống rỗng làm người học bế tắc và **loại** lời lẽ trách móc học viên. |
+| Cho thấy chính sách dựa trên dữ liệu nào | Khối §3.5, 8 mức lương và hạn nộp tại **ảnh S5 [6]** | Bảo đảm không nhầm Bài tập 3 với Bài tập 2 đã có đáp án. **Loại** đoán hạn hoặc ngầm từ chối không giải thích. |
+| Hỗ trợ học thật nhưng không lộ kết quả | Bấm **“Gợi ý tiếp”** để hiện tối đa hai gợi ý cách lập biểu thức/chọn hai vị trí trung tâm, **ảnh S5 [7]** | Gợi mở kỹ năng tự làm; **loại** đưa đáp số, xác nhận đúng/sai hoặc cho gợi ý vô hạn đến khi lộ lời giải. |
+| Cho phép chuyển TA khi cần | Bấm **“Hỏi TA”**, **ảnh S5 [8]**, rồi xác nhận gửi | Vẫn có lối hỗ trợ người thật mà không tự động chuyển mọi câu hỏi. **Loại** tự gửi hoặc để học viên không có bước tiếp. |
+
+**Luồng đầy đủ:** AI xác định bài đang mở → nói rõ không thể giải hộ → nêu nguồn và hạn → học viên nhận gợi ý từng bước → nếu còn vướng thì bấm **“Hỏi TA”** và **“Xác nhận gửi”** → theo dõi yêu cầu. Trong màn hình TA, người thật chỉ **tiếp nhận/hướng dẫn**, không phát đáp án đang mở.
+
+**Ai được báo và khi nào?** Không báo TA nếu học viên chỉ xem câu trả lời hoặc bấm gợi ý. Chỉ sau **xác nhận gửi**, hàng chờ TA mới xuất hiện yêu cầu mô phỏng; ngoài giờ vẫn chờ. Không cam kết xử lý trước hạn bài tập.
+
+**Phân loại lỗi:** nhu cầu hỏi gấp của học viên không phải lỗi cần quy trách nhiệm. Đây là **xung đột ngữ cảnh/thẩm quyền** giữa hỗ trợ học và làm hộ bài. Nếu AI thực tế trả đáp án thì mới là **lỗi hệ thống phá vỡ giới hạn**. UX không mắng người học; thay vì từ chối hoàn toàn, vẫn cung cấp cách học tiếp.
+
+### 3.3. Ba nguyên tắc HAX/PAIR được chọn và minh chứng cụ thể
+
+| Nguyên tắc | Cách áp dụng | Vị trí trên ảnh/chỗ bấm được |
+|---|---|---|
+| **G2 — Make clear how well the system can do what it can do** (nêu mức giới hạn) | Không dùng % tự tin giả khi không có phép đo. Nêu cụ thể “Chưa xác minh” với S2 và “Giới hạn đáp án” với S5. | **Ảnh S2 [1]**, **S5 [5]** và câu AI kèm theo |
+| **G10 — Scope services when in doubt** (thu hẹp việc AI được làm) | S2 không tự phê duyệt nguồn mâu thuẫn, có chuyển TA; S5 giới hạn ở gợi ý phương pháp và không xác nhận kết quả. | **S2 [3]–[4]** (gửi/xác nhận/chờ); **S5 [7]–[8]** (gợi ý/hỏi TA) |
+| **G11 — Make clear why the system did what it did** (giải thích lý do) | S2 dẫn §3.3 và phản ví dụ; S5 dẫn §3.5, trạng thái bài đang mở và hạn nộp. | **S2 [2]**, **S5 [6]** |
+
+**PAIR — Explainability & Trust:** hiển thị nguồn và giới hạn để người dùng **tin đúng mức**, không ép tin AI vì vẻ tự tin. **PAIR — Errors & Graceful Failure:** cả hai ca đều có đường lui hữu ích: xem lý do, gợi ý tiếp, chuyển TA, rút yêu cầu đang chờ. G1 (công khai đây là AI) thể hiện tại đầu khung chat và G9 (hỗ trợ tự sửa) thể hiện ở gợi ý S5; **ba nguyên tắc lấy làm trọng tâm minh chứng là G2, G10, G11**.
+
+### 3.4. Lỗi chỉ sửa câu chữ không cứu được
+
+- **S2:** nói “xin lỗi, mình không chắc” vẫn vô nghĩa nếu `dang_FAQ` tự đăng nội dung sai. Phải **tách dự thảo với công bố**: trên màn hình TA, chỉ người duyệt mới có nút **“TA duyệt & đăng FAQ”**; TA có thể chọn **“Cần xác minh thêm”**. AI không có nút đăng.
+- **S5:** lời từ chối không có giá trị nếu nút gợi ý tiếp vẫn lộ kết quả. Prototype **giới hạn hai gợi ý về phương pháp**, không sinh đáp số hay xác nhận đúng/sai. Đây là thiết kế ràng buộc hành động, không chỉ sửa giọng điệu.
+- **Không chuyển mọi câu cho TA:** chờ người cũng có chi phí (TA quá tải, học viên cần học ban đêm). AI vẫn được tra cứu thông tin có căn cứ và đưa gợi ý hợp lệ; chỉ chuyển các ca cần người xử lý. Phân quyền đầy đủ cho từng tool sẽ phân tích ở **§4**.
+
+### 3.5. Các đường trải nghiệm và tình huống demo chưa bao phủ
+
+| Đường UX | Thiết kế mong muốn | Phạm vi prototype hiện tại |
+|---|---|---|
+| **Happy path** | Câu hỏi bình thường có nguồn → AI giải thích và trích đúng mục, không cần TA. | Chưa có màn hình riêng; hai ca chính ưu tiên failure/correction. |
+| **Low confidence** | Câu “cái độ lệch ấy” thiếu nghĩa (S3) → hỏi lại một câu, không đoán. | Có trong §2, chưa mô phỏng trọn luồng phân nhánh. |
+| **Failure — S2** | Cảnh báo + dẫn §3.3 + phản ví dụ + chuyển TA khi người dùng xác nhận. | **Có thể bấm** trên `index.html`. |
+| **Correction — S2/S5** | Rút yêu cầu đang chờ; TA xem lại và duyệt nội dung FAQ khi đủ căn cứ. | **Có thể bấm** (trạng thái chỉ lưu trong phiên trang). |
+
+**Quy tắc trạng thái:** “Đã gửi yêu cầu” khác “TA đã tiếp nhận”, khác “TA đã duyệt”. Demo không kết nối server hay TA thật. Không được mô tả những trạng thái giả lập này là thông báo thực tế đến người ngoài.
+
+### 3.6. Ảnh chụp minh chứng (đánh số 1–8)
+
+**Ảnh S2 — Nguồn sai và chuyển TA:**
+
+![Ảnh chụp S2 với đánh dấu UX 1–4](prototype/screen-s2.png)
+
+- **[1]** Nhãn “Chưa xác minh” — G2.
+- **[2]** Nguồn §3.3, câu sai và phản ví dụ — G11.
+- **[3]** Nút “Gửi TA xác minh” — G10.
+- **[4]** Trạng thái yêu cầu đang chờ / rút yêu cầu — PAIR graceful failure.
+
+**Ảnh S5 — Giới hạn đáp án và gợi ý:**
+
+![Ảnh chụp S5 với đánh dấu UX 5–8](prototype/screen-s5.png)
+
+- **[5]** Nhãn “Giới hạn đáp án” — G2.
+- **[6]** Nguồn §3.5 và hạn nộp — G11.
+- **[7]** Gợi ý từng bước sau khi bấm — G10.
+- **[8]** Nút “Hỏi TA” — G10.
+
+Hai ảnh là hai **trạng thái thật đã render bằng Chrome** từ prototype (có thêm số chú thích cho mục đích báo cáo); màn hình TA có thể mở trực tiếp khi demo. Các số không phải phần của giao diện người dùng thực.
+
+## §4. Mức tự chủ của AI (chặng 4 — M2)
+
+### 4.1. Nguyên tắc chốt chính sách
+
+Nhóm thống nhất **đề xuất chính sách sản phẩm** dựa theo mức hại khi AI sai, khả năng đảo ngược và chi phí chờ người duyệt. Có ba mức của đề: **tự làm / cần người duyệt / cấm**. “Tự làm có giới hạn” là **mức tự làm, kèm luật ràng buộc**, không phải mức thứ tư. Tương tự, trường hợp hành động bị cấm được diễn đạt bằng **luật cấm trong phạm vi tool**, không nhất thiết cấm cả tool.
+
+Quy tắc gốc: **chỉ đọc và gợi ý an toàn thì tự thực hiện; tạo yêu cầu gửi đi phải có người học xác nhận; xuất bản cho cả lớp cần TA duyệt; phát đáp án bài đang mở và bịa nguồn bị cấm**. Những quyết định này thể hiện trực tiếp trong `prototype/index.html`, khu vực “4 tool và mức tự chủ”, khối “Quyết định quyền tự chủ đang áp dụng” và các nút thao tác của từng ca.
+
+### 4.2. Ma trận phân quyền cho cả bốn tool
+
+| Tool | Mức đã chọn | Người duyệt / thấy gì / nếu quá hạn | Cost-of-error: ai mất gì, đảo ngược được không, chờ người mất gì | Phương án khác và lý do loại |
+|---|---|---|---|---|
+| `tra_cuu_tai_lieu` | **Tự làm** (chỉ đọc và trả trích dẫn thật). **Luật:** không có nguồn thì báo không có; nguồn mâu thuẫn thì cảnh báo, không tự cho là đúng. | **Không cần duyệt** tra cứu. Nếu mâu thuẫn như S2, mở đường `chuyen_TA` chứ không sửa tài liệu. | Sai nguồn gây học nhầm (S1, S8); nguồn thật nhưng nội dung sai gây học sai âm thầm (S2). Tool chỉ đọc nên ít tác động trực tiếp, song học viên vẫn chịu hậu quả nhận thức. Chờ TA duyệt từng phép tra cứu lúc tối muộn sẽ làm tính năng vô dụng. | **Loại** yêu cầu TA duyệt mọi truy vấn vì quá chậm; **loại** tin tuyệt đối mọi đoạn có trích dẫn vì không ngăn được S2. |
+| `goi_y_bai_tap` | **Tự làm có giới hạn**: được gợi ý phương pháp và bước đầu; **cấm** giải trọn, chốt nhận xét hoặc xác nhận đúng/sai cho bài **đang mở**. Với bài 2 đã hết hạn và công bố đáp án thì có thể giải thích đầy đủ từ nguồn. | **Không cần duyệt** gợi ý hợp lệ. Khi học viên cần hỗ trợ thêm, có thể chọn gửi TA. Giao diện S5 cho tối đa **hai gợi ý mẫu** rồi dừng. | Hậu quả sai lớn: lời giải bài 3 bị học viên chép, không thể thu hồi (S5); chỉ trả “đúng/sai” cũng làm lộ thông tin (S6). Nhưng bắt duyệt từng gợi ý khiến học viên phải chờ ngoài giờ **08:00–22:00**. | **Loại** tự giải không giới hạn vì xâm phạm tính trung thực; **loại** cấm hoàn toàn mọi hướng dẫn vì học viên mất sự hỗ trợ học tập; **loại** duyệt mọi gợi ý vì chi phí chờ quá cao. |
+| `chuyen_TA` | **Cần người duyệt: học viên xác nhận gửi**. AI có thể **soạn sẵn** nội dung dựa trên nguồn nhưng chỉ đưa vào hàng chờ sau nút **“Xác nhận gửi”**. | **Ai duyệt:** học viên. **Thấy:** lý do, dữ liệu dự kiến gửi và giờ TA **08:00–22:00** trong hộp thoại. **Quá hạn / ngoài giờ:** chỉ hiện “Chờ TA xác minh”, không tự hứa thời điểm trả lời; yêu cầu chờ có thể được rút khi chưa xử lý. | Gửi nhầm/không đồng ý có thể chia sẻ câu hỏi không mong muốn, tăng hàng chờ và gây khó chịu; yêu cầu chờ còn rút được nhưng không đảm bảo rút được nội dung sau khi đã được người nhận đọc. Xin học viên xác nhận mất một cú bấm, ít tốn hơn gửi nhầm. | **Loại** tự động chuyển mọi trường hợp vì quá tải, thiếu kiểm soát; **loại** cấm chuyển vì S2 không được xác minh; **loại** bắt TA duyệt trước khi câu hỏi xuất hiện trong hàng chờ vì tạo vòng lặp vô lý. |
+| `dang_FAQ` | **Cần người duyệt: TA/giảng viên**; AI không tự công bố. Đây là tool có phạm vi ảnh hưởng rộng nhất. | **Ai duyệt:** TA (giảng viên có thể giám sát). **Thấy:** câu hỏi, nguồn §3.3, lý do nghi sai và nội dung đính chính có thể chỉnh. **Không ai duyệt:** giữ **chưa công bố/cần xác minh thêm**; không tự chuyển sang “đã duyệt” sau thời gian chờ. | FAQ sai có thể làm cả lớp học sai (S2). Gỡ FAQ được nhưng người đã đọc có thể vẫn tin nội dung sai. Chờ người duyệt làm giảm tốc độ đăng FAQ, chấp nhận được so với hậu quả lan truyền. | **Loại** tự đăng vì hậu quả rộng và khó thu hồi; **loại** cấm toàn bộ FAQ vì bỏ mất lợi ích dùng lại câu hỏi đã xác minh. |
+
+**Luật cấm cụ thể:** không bịa “slide 12” hoặc nội dung buổi chưa mở (S1/S8); không đưa hay xác nhận đáp số Bài tập 3 khi còn mở (S5/S6); không nhận xét năng lực học viên (S7); không tự sửa tài liệu gốc hoặc tự đăng FAQ; không thông báo “TA đã xử lý” khi mới chỉ tạo yêu cầu. Đây là **hành vi bị cấm** bất kể tool nào phát sinh.
+
+### 4.3. Tool khó phân loại nhất và cách ra quyết định
+
+**Tool khó nhất: `goi_y_bai_tap`.** Nhóm chọn **tự làm có giới hạn** vì phải cân bằng hai cái giá ngược nhau:
+
+- **Tự làm không giới hạn:** học viên được đáp ngay, nhưng S5/S6 có thể rò đáp án, không thể hoàn tác sau khi người học chép.
+- **Cần TA duyệt từng gợi ý:** ngăn rò đáp án tốt hơn nhưng học viên học tối muộn phải chờ đến ca trực; gợi ý kiến thức cơ bản trở nên quá chậm.
+- **Cấm tool:** tránh làm hộ nhưng trái mục tiêu trợ lý Study mode, khiến học viên không được hỗ trợ lúc cần nhất.
+- **Chốt phương án sản phẩm:** **tự làm có giới hạn nội dung** (gợi ý phương pháp, không đưa/nhận xét kết quả cuối với bài đang mở), kèm đường chuyển TA có xác nhận.
+
+**Ý kiến từng thành viên:** nhóm đã đồng ý với **phương án chốt** được nêu ở trên. Tuy nhiên chưa có dữ liệu về **mức mà từng người đã tự chọn trước khi thảo luận**. Để không bịa quá trình ra quyết định, lưu bảng này ở trạng thái cần đối chiếu với ba thành viên:
+
+| Thành viên | Lựa chọn cá nhân trước khi thảo luận | Đối chiếu lý do với S5/S6 |
+|---|---|---|
+| Nguyễn Văn Minh (2A202603551) | **Chờ thành viên xác nhận** | Cần ghi mức ban đầu và vì sao. |
+| Nguyễn Trường Thành (2A202603512) | **Chờ thành viên xác nhận** | Cần ghi mức ban đầu và vì sao. |
+| Tạ Tiến Dũng (2A202603526) | **Chờ thành viên xác nhận** | Cần ghi mức ban đầu và vì sao. |
+
+Sau khi cả ba xác nhận, thay ba ô “Chờ thành viên xác nhận” bằng lựa chọn thực tế; **không đổi kết luận đã chốt** trừ khi nhóm quyết định khác.
+
+### 4.4. Kiểm thử chính sách trên hai ca nguy hiểm và một ca bình thường
+
+| Ca thử | Tool và mức áp dụng | Kết quả mong muốn, cơ chế chặn | Có làm khi lẽ ra phải hỏi? Có bắt chờ vô ích? | Kết quả prototype |
+|---|---|---|---|---|
+| **S2 — Độ lệch chuẩn luôn nhỏ hơn phương sai?** | `tra_cuu_tai_lieu`: tự đọc; `chuyen_TA`: học viên xác nhận; `dang_FAQ`: TA duyệt. | Có cảnh báo §3.3, trích nguồn và phản ví dụ; FAQ **không xuất bản trước nút TA duyệt**. | AI không tự gửi ticket; nếu học viên không xác nhận thì không có yêu cầu. TA ngoài giờ chỉ thấy chờ. | **PASS theo luồng mô phỏng:** từ cảnh báo → xác nhận gửi → hàng chờ → TA duyệt mới có FAQ. **Chưa kiểm chứng** khả năng AI tự phát hiện nguồn sai ngoài kịch bản giả lập. |
+| **S5 — Xin giải hết Bài tập 3** | `goi_y_bai_tap`: tự làm có giới hạn; `chuyen_TA`: học viên xác nhận. | Không đáp số/nhận xét hộ; gợi ý phương pháp và cho chuyển TA. | Không tự giải ngay cả khi người dùng thúc giục. Nhận gợi ý không phải chờ người; nếu chọn hỏi TA thì mới chờ. | **PASS theo luồng mô phỏng:** hai gợi ý đã định sẵn, không tiết lộ hoặc xác nhận đáp án. **Chưa phải** bộ lọc chống lộ đáp án cho LLM thật. |
+| **S0 — “Trung vị khác trung bình cộng chỗ nào?”** | `tra_cuu_tai_lieu`: tự làm. Không gọi `chuyen_TA` hoặc `dang_FAQ`. | Trả đúng §3.1 (trung bình) và §3.2 (trung vị), lý giải giá trị ngoại lai; không cho kết quả Bài tập 3. | Không cần hỏi lại vì yêu cầu rõ; không bắt học viên chờ TA. | **PASS theo luồng mô phỏng:** chọn **S0 · Bình thường**, xem nguồn, phản hồi trực tiếp; không tạo hàng chờ. |
+
+**Giới hạn thử nghiệm:** tất cả phản hồi được lập trình bằng dữ liệu dựng. PASS ở đây xác nhận **thiết kế/luồng thao tác trong prototype**, không phải đánh giá tỷ lệ sai của mô hình AI ngoài thực tế.
+
+### 4.5. Luật bổ sung, tách bước và điều khiển trên UI
+
+1. **Tách `chuyen_TA` thành “chuẩn bị yêu cầu” → “học viên xác nhận gửi” → “chờ TA xử lý”.** Nút **“Gửi TA xác minh”/“Hỏi TA”** chỉ mở hộp thoại. Không có bản ghi hàng chờ trước khi bấm **“Xác nhận gửi”**. Trạng thái chờ cho phép **“Rút yêu cầu”**.
+2. **Tách `dang_FAQ` thành “chuẩn bị bản nháp” → “TA kiểm tra/chỉnh sửa” → “TA duyệt & đăng FAQ”.** Học viên/AI không có nút đăng; nếu TA chưa duyệt, nội dung không công bố. Nút **“Cần xác minh thêm”** giữ yêu cầu chưa công bố.
+3. **`goi_y_bai_tap` phải kiểm tra trạng thái bài trước khi trả gợi ý**; nếu đang mở, chỉ được trả bước/phương pháp, không xác nhận “12 đúng không”. Demo dùng hai gợi ý giới hạn. **Không nên coi việc chỉ giới hạn số gợi ý là đủ trong hệ thống AI thật**: cần thêm kiểm tra nội dung câu trả lời.
+4. **`tra_cuu_tai_lieu` không được giả trích dẫn.** Nếu không có mục thật phải báo không có; nếu mục tồn tại mà nghi sai (S2), đánh dấu “Chưa xác minh” và không dùng làm câu trả lời chắc chắn.
+
+**Vị trí giao diện sau cập nhật:** bên phải trang **Học viên** có bảng “4 tool và mức tự chủ”; trong mỗi phản hồi có khối **“Quyết định quyền tự chủ đang áp dụng”**. Nút xem nguồn trong **S0**, cảnh báo và gửi TA trong **S2**, gợi ý giới hạn và nút hỏi TA trong **S5** thể hiện các mức khác nhau. Khi đổi vai trò **Trợ giảng TA**, chỉ TA được bấm duyệt FAQ trong bản demo.
+
+### 4.6. Lời hứa với học viên thay đổi ra sao?
+
+| Lời hứa dễ gây hiểu nhầm | Lời hứa sau phân quyền |
+|---|---|
+| “AI giải được mọi bài.” | **“AI hướng dẫn từng bước nhưng không giải hộ hoặc xác nhận đáp án bài đang mở.”** |
+| “AI dẫn giáo trình nên luôn đúng.” | **“AI dẫn đúng mục; nếu nguồn đáng ngờ, AI chỉ rõ giới hạn và đề nghị TA xác minh.”** |
+| “AI đã báo TA rồi.” | **“Bạn xem và xác nhận trước khi gửi; sau đó có trạng thái chờ, không hứa TA xử lý ngay.”** |
+| “AI tự chia sẻ FAQ cho lớp.” | **“AI hỗ trợ chuẩn bị nội dung, nhưng TA phải xem và duyệt trước khi công bố.”** |
+
+**Kết luận CP4:** mức tự chủ không dựa vào chuyện AI có *thể* làm, mà vào **AI có *quyền* làm và hậu quả nếu sai**. Điều có thể thử ngay trên UI là cơ chế chặn/phê duyệt; phần nhận biết lỗi và độ tin cậy của AI thật cần kiểm thử riêng ngoài phạm vi lab.
 
 ## §5. Prototype  (chặng 5)
 - Link hoặc file · công cụ · phần nào mock · có lời gọi AI thật không.
