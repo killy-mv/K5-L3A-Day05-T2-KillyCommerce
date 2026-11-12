@@ -187,14 +187,6 @@ Quy tắc gốc: **chỉ đọc và gợi ý an toàn thì tự thực hiện; t
 
 **Ý kiến từng thành viên:** nhóm đã đồng ý với **phương án chốt** được nêu ở trên. Tuy nhiên chưa có dữ liệu về **mức mà từng người đã tự chọn trước khi thảo luận**. Để không bịa quá trình ra quyết định, lưu bảng này ở trạng thái cần đối chiếu với ba thành viên:
 
-| Thành viên | Lựa chọn cá nhân trước khi thảo luận | Đối chiếu lý do với S5/S6 |
-|---|---|---|
-| Nguyễn Văn Minh (2A202603551) | **Chờ thành viên xác nhận** | Cần ghi mức ban đầu và vì sao. |
-| Nguyễn Trường Thành (2A202603512) | **Chờ thành viên xác nhận** | Cần ghi mức ban đầu và vì sao. |
-| Tạ Tiến Dũng (2A202603526) | **Chờ thành viên xác nhận** | Cần ghi mức ban đầu và vì sao. |
-
-Sau khi cả ba xác nhận, thay ba ô “Chờ thành viên xác nhận” bằng lựa chọn thực tế; **không đổi kết luận đã chốt** trừ khi nhóm quyết định khác.
-
 ### 4.4. Kiểm thử chính sách trên hai ca nguy hiểm và một ca bình thường
 
 | Ca thử | Tool và mức áp dụng | Kết quả mong muốn, cơ chế chặn | Có làm khi lẽ ra phải hỏi? Có bắt chờ vô ích? | Kết quả prototype |
