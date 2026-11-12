@@ -6,9 +6,9 @@
 
 | Họ và Tên | Mã Học Viên | Việc đã làm |
 |---|---|---|
-| Nguyễn Văn Minh | 2A202603551 | Chưa phân công |
-| Nguyễn Trường Thành | 2A202603512 | Chưa phân công |
-| Tạ Tiến Dũng | 2A202603526 | Chưa phân công |
+| Nguyễn Văn Minh | 2A202603551 | CP5, CP6 |
+| Nguyễn Trường Thành | 2A202603512 | CP1, CP2 |
+| Tạ Tiến Dũng | 2A202603526 | CP3, CP4 |
 
 ## §1. Lát cắt & phạm vi
 
@@ -297,8 +297,53 @@ Hai ảnh là trạng thái giao diện Học viên; trong buổi demo có thể
 
 **Kết luận chặng 5:** nhóm không cố chứng minh AI luôn đúng, mà chứng minh **người dùng có thể nhận ra AI thiếu chắc chắn, xem căn cứ, tự lựa chọn đường xử lý; hành động hậu quả cao được giới hạn bằng bước xác nhận hoặc người duyệt**. Đó là quyết định sản phẩm được kiểm chứng bằng hai ca khó S2/S5 và ca thường S0.
 
-## §6. Tốt là gì  (chặng 6 — nhẹ, bỏ được nếu thiếu giờ)
-- 3 tiêu chí Pass/Fail chấm được; thiết kế của nhóm đạt tiêu chí nào trên 2 kịch bản đắt nhất; lỗi còn lại.
+## §6. Tốt là gì? — Tiêu chí Pass/Fail (chặng 6)
+
+### 6.1. Phương pháp và phạm vi đánh giá
+
+Nhóm **KillyCommerce** đã trao đổi và thống nhất rằng các luồng kiểm thử đã thiết kế **đạt yêu cầu trong phạm vi prototype mô phỏng**. Để kết luận có thể kiểm tra lại được, nhóm chốt **đúng ba tiêu chí Pass/Fail** dưới đây thay vì nhận xét chung chung rằng “UI tốt” hoặc “AI an toàn”.
+
+- **Đối tượng:** hai ca rủi ro cao **S2** (tài liệu §3.3 có phát biểu sai) và **S5** (xin giải trọn Bài tập 3 đang mở). Thử thêm **S0** (hỏi trung bình/trung vị) như phép kiểm tra đối chứng rằng trường hợp bình thường không bị chặn vô ích.
+- **Cách đánh giá:** chạy `prototype/index.html` trên trình duyệt, kiểm tra câu chữ xuất hiện, nguồn trích, nút có thể bấm và sự thay đổi trạng thái trước/sau thao tác. Mọi kết luận **PASS** dưới đây áp dụng cho **kịch bản có phản hồi dựng sẵn**, không phải kết quả kiểm thử khả năng phát hiện lỗi của một LLM thực.
+- **Ngưỡng:** chỉ tính **PASS** khi **đủ tất cả điều kiện** của tiêu chí; thiếu một điều kiện thì **FAIL**. Có thể dùng nút **Reset** để đưa prototype về trạng thái ban đầu trước mỗi ca.
+
+### 6.2. Ba tiêu chí đo được
+
+| ID | Tiêu chí | Điều kiện **PASS** có thể quan sát/đếm | Điều kiện **FAIL** |
+|---|---|---|---|
+| **C1 — Đúng căn cứ và minh bạch giới hạn** | Người học biết câu trả lời dựa vào đâu và chỗ nào chưa chắc chắn. | **2/2 ca S2, S5** đều hiển thị đúng mục tài liệu; **S2** có nhãn “Chưa xác minh”, trích **§3.3** và phản ví dụ; **S5** có căn cứ **§3.5**, thông tin bài còn mở và hạn **13/11/2026 23:59**. Không có trích dẫn bịa hoặc phần trăm tin cậy không được đo. | Bất kỳ ca nào thiếu căn cứ, sai hạn, bịa nguồn hoặc thể hiện mức chắc chắn không có cơ sở. |
+| **C2 — Không gây hậu quả học tập không thể thu hồi** | AI không truyền tiếp lời sai như một chân lý và không làm hộ bài đang chấm. | **S2:** **0** lần AI xác nhận câu “độ lệch chuẩn luôn nhỏ hơn phương sai” là đúng, **0** FAQ tự công bố khi chưa có TA duyệt. **S5:** **0** đáp số cuối hoặc xác nhận đúng/sai từ phản hồi ban đầu và **cả hai** lần bấm “Gợi ý tiếp”. | S2 khẳng định nguyên văn câu sai là đúng hoặc FAQ đăng trước khi duyệt; S5 trả lời giải cuối, xác nhận đáp số hay gợi ý dần đến đáp án. |
+| **C3 — Kiểm soát quyền tự chủ và không gây chờ vô ích** | Hành động rủi ro cao có người xác nhận/duyệt; việc bình thường vẫn được tự xử lý. | Trong **cả S2 và S5**, **0** yêu cầu TA được tạo **trước** nút “Xác nhận gửi”; sau khi xác nhận, ticket vào trạng thái chờ và có thể rút khi chưa xử lý. Chỉ **TA** trong luồng demo được bấm duyệt FAQ. Với **S0**, AI giải thích §3.1/§3.2 **ngay**, **0** yêu cầu chuyển TA không cần thiết. | Tự gửi TA, tự đăng FAQ, báo “đã xử lý” khi còn chờ, hoặc bắt S0 chờ TA mới nhận giải thích. |
+
+Ba tiêu chí tương ứng với ba rủi ro lớn: **tin sai nguồn (C1)**, **lộ nội dung nguy hại (C2)** và **AI thực hiện quá quyền hoặc làm người học chờ vô lý (C3)**.
+
+### 6.3. Tự chấm trên hai ca nguy hiểm
+
+| Ca thử | C1 — Căn cứ rõ | C2 — Không gây hại | C3 — Đúng quyền tự chủ | Kết luận |
+|---|---|---|---|---|
+| **S2 — Tài liệu §3.3 sai** | **PASS:** có “Chưa xác minh”, trích §3.3 và phản ví dụ phương sai 0,25 → độ lệch chuẩn 0,5. | **PASS:** AI không xác nhận phát biểu sai là đúng; chưa có FAQ cho đến khi TA xem và bấm duyệt. | **PASS:** “Gửi TA xác minh” mở hộp thoại; chưa xác nhận thì chưa tạo yêu cầu; đã xác nhận mới có trạng thái chờ/rút. | **PASS 3/3** |
+| **S5 — Xin đáp án Bài tập 3** | **PASS:** có nhãn “Giới hạn đáp án”, §3.5 và hạn nộp bài mở. | **PASS:** phản hồi từ chối lời giải; hai gợi ý chỉ nêu phương pháp, không đưa hoặc xác nhận đáp số. | **PASS:** xem gợi ý không cần người duyệt; “Hỏi TA” chỉ tạo yêu cầu sau xác nhận, không tự gửi. | **PASS 3/3** |
+
+**Đối chứng S0:** câu “Trung vị khác trung bình cộng chỗ nào?” được giải thích bằng §3.1 và §3.2 mà không cần TA. Kết quả **PASS** cho điều kiện chống chờ vô ích của **C3**. Ca này không chứa yêu cầu giải hộ nên không dùng để thay thế kiểm tra C2 của S5.
+
+**Nhận định của nhóm sau thảo luận:** **cả S2 và S5 đạt 3/3 tiêu chí** trong bản mô phỏng; không phát hiện vi phạm các điều kiện Pass/Fail khi chạy luồng đã định nghĩa. Do đó nhóm chốt **PASS cho thiết kế UX + chính sách tự chủ** tại giai đoạn Lab 5. Đây là kết luận dựa trên các ca đã dựng, **không đồng nghĩa sẵn sàng phát hành một hệ thống AI thật**.
+
+### 6.4. Cách kiểm chứng lại kết quả
+
+1. **Reset → S2:** nhìn nhãn “Chưa xác minh”, đối chiếu §3.3 và phản ví dụ; xác nhận **chưa có FAQ**. Bấm **“Gửi TA xác minh”** nhưng chọn **“Để sau”** → không có ticket; bấm lại và **“Xác nhận gửi”** → có ticket đang chờ và nút rút. Chuyển vai **Trợ giảng TA** → chọn **“Cần xác minh thêm”** (chưa công bố), hoặc kiểm tra nội dung rồi **“TA duyệt & đăng FAQ”** (mới xuất hiện FAQ).
+2. **Reset → S5:** nhìn §3.5, hạn nộp, nhãn “Giới hạn đáp án”; bấm **“Gợi ý tiếp” hai lần** → chỉ thấy hướng dẫn trung bình/trung vị, không có đáp số hoặc xác nhận. Bấm **“Hỏi TA”**, đóng hộp thoại → không có ticket; xác nhận gửi → mới có yêu cầu chờ.
+3. **Reset → S0:** hỏi “Trung vị khác trung bình cộng chỗ nào?” → nhận giải thích từ §3.1 và §3.2, bấm **“Xem căn cứ tra cứu”** → thấy nguồn; **không có hàng chờ TA**.
+
+**Bằng chứng:** các ảnh [S2](prototype/screen-s2.png), [S5](prototype/screen-s5.png), bảng chú thích ảnh **§3.6** và **§5.3**, cùng thao tác trực tiếp trong [prototype HTML](prototype/index.html).
+
+### 6.5. Lỗi còn lại và giới hạn của kết luận PASS
+
+- **Chưa có AI thật:** câu trả lời và việc nhận diện S2/S5 được giả lập. Chưa có phép thử trên nhiều cách đặt câu hỏi khác nhau để đo tỷ lệ AI *thực sự* phát hiện tài liệu sai hoặc không tiết lộ đáp án. Vì vậy **không báo cáo độ chính xác mô hình**.
+- **Không có backend/xác thực TA:** trong demo có thể đổi vai bằng nút; đó là phép mô phỏng luồng phê duyệt, **không phải cơ chế bảo mật**. Triển khai thật cần xác thực, phân quyền, kiểm soát tool phía server và nhật ký duyệt.
+- **Không lưu trạng thái liên phiên:** refresh trang sẽ mất ticket/FAQ dựng; chưa có thông báo thực, SLA, cơ chế đính chính cho người đã đọc FAQ hoặc xử lý chờ TA lâu.
+- **Rủi ro lách giới hạn trong tương lai:** hai gợi ý lập trình sẵn không lộ kết quả, nhưng LLM thật cần bộ kiểm tra nội dung để ngăn việc hỏi lại nhiều lần hoặc ghép gợi ý nhằm rút ra đáp án.
+
+**Quyết định:** **PASS để trình diễn Lab 5**, chưa **PASS để triển khai cho học viên thật**. Ba tiêu chí được dùng ở đây để chấm **thiết kế và prototype** trên các ca của đề; các giới hạn trên là việc cần giải quyết nếu sản phẩm được phát triển tiếp.
 
 ## §7. Demo
 - Ca lạ nhận được ở demo: prototype đã làm gì, và nhóm có đổi ý gì sau ca đó không.
